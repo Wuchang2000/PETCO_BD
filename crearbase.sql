@@ -1,12 +1,4 @@
-/*
- * ER/Studio 8.0 SQL Code Generation
- * Company :      FI-UNAM
- * Project :      P1.DM1
- * Author :       Leon_M119
- *
- * Date Created : Tuesday, June 06, 2023 15:32:46
- * Target DBMS : Microsoft SQL Server 2008
- */
+
 
 /* 
  * TABLE: ADMINISTRATIVO 
