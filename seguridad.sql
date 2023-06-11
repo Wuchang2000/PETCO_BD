@@ -1,3 +1,10 @@
+/*
+ * EQUIPO 7 GUARDERIA DE MASCOTAS
+ * CORIA MARTINEZ GUSTAVO
+ * ORONZOR MONTES MANASES LEONEL
+ * PANG ARAIZAGA IAN
+*/
+
 use [Equipo7_PETCO]
 go
 
@@ -23,8 +30,8 @@ CREATE LOGIN usuarioComun WITH PASSWORD = 'Passw0rd*', CHECK_POLICY = OFF;
 CREATE USER usuarioComun FOR LOGIN usuarioComun;
 
 -- Asignar permisos
-GRANT SELECT ON dbo.producto_central TO usuarioComun; -- Permisos de consulta en el catálogo de productos
-GRANT SELECT ON dbo.centro TO usuarioComun; -- Permisos de consulta en la tabla de centros
+GRANT SELECT ON catalogos.producto_central TO usuarioComun; -- Permisos de consulta en el catálogo de productos
+GRANT SELECT ON catalogos.centro TO usuarioComun; -- Permisos de consulta en la tabla de centros
 
 ----------------------------------------------------------------------------------------------
 -----------------------Usuario Personal de ayuda (Cuidadores)
@@ -56,7 +63,7 @@ CREATE LOGIN Veterinario WITH PASSWORD = 'P&ssword1', CHECK_POLICY = OFF;
 CREATE USER Veterinario FOR LOGIN Veterinario;
 
 -- Consultas médicas para las mascotas -- Otorgar permisos de consultas
-Grant Insert ON dbo.consulta TO Veterinario; -- No tengo claro lo de que tabla hace esto.
+Grant Insert ON general.consulta TO Veterinario; -- No tengo claro lo de que tabla hace esto.
 
 ----------------------------------------------------------------
 -----------------Encargado de tienda
@@ -75,14 +82,14 @@ GRANT UPDATE ON producto_central TO EncargadoTienda;
 
 CREATE LOGIN administrativo WITH PASSWORD = '1qaz2wsx*', CHECK_POLICY = OFF;
 CREATE USER administrativo FOR LOGIN administrativo;
-GRANT insert, update, delete, select ON dbo.Usuario_comun TO administrativo;
-GRANT insert, update, delete, select ON dbo.veterinario TO administrativo;
-GRANT insert, update, delete, select ON dbo.personal_ayuda TO administrativo;
-GRANT insert, update, delete, select ON dbo.empleado TO administrativo;
-GRANT insert, update, delete, select ON dbo.Oferta TO administrativo;
-GRANT insert, update, delete, select ON dbo.Categoria_producto TO administrativo;
-GRANT insert, update, delete, select ON dbo.Producto_tienda TO administrativo;
-GRANT insert, update, delete, select ON dbo.Producto_central TO administrativo;
+GRANT insert, update, delete, select ON general.Usuario_comun TO administrativo;
+GRANT insert, update, delete, select ON empleados.veterinario TO administrativo;
+GRANT insert, update, delete, select ON empleados.personal_ayuda TO administrativo;
+GRANT insert, update, delete, select ON empleados.empleado TO administrativo;
+GRANT insert, update, delete, select ON catalogos.Oferta TO administrativo;
+GRANT insert, update, delete, select ON catalogos.Categoria_producto TO administrativo;
+GRANT insert, update, delete, select ON catalogos.Producto_tienda TO administrativo;
+GRANT insert, update, delete, select ON catalogos.Producto_central TO administrativo;
 
 ---------------------------------------------------------
 -----------------Gerente

@@ -1,7 +1,14 @@
+/*
+ * EQUIPO 7 GUARDERIA DE MASCOTAS
+ * CORIA MARTINEZ GUSTAVO
+ * ORONZOR MONTES MANASES LEONEL
+ * PANG ARAIZAGA IAN
+*/
+
 -------------------------------------PROCEDIMIENTOS ALMACENADOS-------------------------------------------
 
 --Realice un procedimiento almacenado para registrar una mascota y su brazalete
-Create or alter procedure dbo.registro_mascota_brazalete
+Create or alter procedure general.registro_mascota_brazalete
 @p_id_empleado numeric(10, 0),
 @p_id_usuario numeric(10, 0),
 @p_id_guarderia numeric(10, 0),
@@ -19,24 +26,24 @@ Create or alter procedure dbo.registro_mascota_brazalete
 
 as
 begin
-	INSERT INTO dbo.MASCOTA (id_empleado, id_usuario, id_guarderia,
+	INSERT INTO general.MASCOTA (id_empleado, id_usuario, id_guarderia,
 	nombre, especie, sexo, raza, razgos, edad)
 	VALUES (@p_id_empleado, @p_id_usuario, @p_id_guarderia, @p_nombre,
 	@p_especie, @p_sexo, @p_raza, @p_razgos, @p_edad);
-	INSERT INTO REGISTRO_BRAZALETE (id_mascota, ritmoC, temp, nivelOx, tipo_Comida, comida_Comio, [fecha/hora])
-	VALUES ((select max(id_mascota) from dbo.MASCOTA), @p_ritmo, @p_temp, @p_nivelOx, 
+	INSERT INTO general.REGISTRO_BRAZALETE (id_mascota, ritmoC, temp, nivelOx, tipo_Comida, comida_Comio, [fecha/hora])
+	VALUES ((select max(id_mascota) from general.MASCOTA), @p_ritmo, @p_temp, @p_nivelOx, 
 	@p_tipo_comida, @p_comida_comio, GETDATE());
 	SELECT 'Mascota y brazalete registrados correctamente' AS Mensaje;
 end
 
 begin tran
-SELECT * from dbo.MASCOTA
-SELECT * from dbo.REGISTRO_BRAZALETE
-execute dbo.registro_mascota_brazalete 14, 16, 5, 'LUCY', 'gato', 
+SELECT * from general.MASCOTA
+SELECT * from general.REGISTRO_BRAZALETE
+execute general.registro_mascota_brazalete 14, 16, 5, 'LUCY', 'gato', 
 'hembra', 'atigrado', 'doméstico', 2, '60-100', '36', '80', 'croquetas', 'No'
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.MASCOTA
-SELECT * from dbo.REGISTRO_BRAZALETE
+SELECT * from general.MASCOTA
+SELECT * from general.REGISTRO_BRAZALETE
 rollback tran
 
 --Si se prueba es necesario quitar la insercion del indexado
@@ -50,7 +57,7 @@ DBCC CHECKIDENT ('[registro_brazalete]', NORESEED);
 --Realice un procedimiento almacenado para el actualizar de las lecturas en los
 --brazaletes
 
-Create or alter procedure dbo.nuevo_registro_brazalete
+Create or alter procedure general.nuevo_registro_brazalete
 @p_id_registro numeric(10, 0),
 @p_id_mascota numeric(10, 0),
 @p_ritmo char(10),
@@ -62,10 +69,10 @@ Create or alter procedure dbo.nuevo_registro_brazalete
 
 as
 begin
-	if exists (Select * from dbo.REGISTRO_BRAZALETE 
+	if exists (Select * from general.REGISTRO_BRAZALETE 
 				where id_registro = @p_id_registro and id_mascota = @p_id_mascota)
 	begin
-		update dbo.REGISTRO_BRAZALETE set
+		update general.REGISTRO_BRAZALETE set
 		id_mascota = @p_id_mascota,
 		ritmoC = @p_ritmo,
 		temp = @p_temp,
@@ -84,17 +91,17 @@ end
 
 --Prueba de funcionamiento
 begin tran
-SELECT * from dbo.REGISTRO_BRAZALETE
-execute dbo.nuevo_registro_brazalete 5, 5, '60-100', '2024-06-28 17:39:00', '36', '80', 'croquetas', 'No'
+SELECT * from general.REGISTRO_BRAZALETE
+execute general.nuevo_registro_brazalete 5, 5, '60-100', '2024-06-28 17:39:00', '36', '80', 'croquetas', 'No'
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.REGISTRO_BRAZALETE
+SELECT * from general.REGISTRO_BRAZALETE
 rollback tran
 
 ----------------------------------------------------------------------------------------------------------
 
 --Realice un procediendo almacenado para registrar una consulta
 
-CREATE or alter PROCEDURE dbo.RegistrarConsulta
+CREATE or alter PROCEDURE general.RegistrarConsulta
     @id_empleado numeric(10, 0),
     @fecha date,
     @hora time(7),
@@ -104,7 +111,7 @@ CREATE or alter PROCEDURE dbo.RegistrarConsulta
     @id_mascota numeric(10, 0)
 AS
 BEGIN
-    INSERT INTO CONSULTA (id_empleado, fecha, hora, diagnostico, detalles, costo_total, id_mascota)
+    INSERT INTO general.CONSULTA (id_empleado, fecha, hora, diagnostico, detalles, costo_total, id_mascota)
     VALUES (@id_empleado, @fecha, @hora, @diagnostico, @detalles, @costo_total, @id_mascota);
 
     SELECT 'Consulta registrada correctamente' AS Mensaje;
@@ -112,10 +119,10 @@ END
 
 --Prueba de funcionamiento
 begin tran
-SELECT * from dbo.CONSULTA
-execute dbo.RegistrarConsulta 16, '2023-06-28', '17:39:00', 'mordedura', 'reposo', 0.00, 5
+SELECT * from general.CONSULTA
+execute general.RegistrarConsulta 16, '2023-06-28', '17:39:00', 'mordedura', 'reposo', 0.00, 5
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.CONSULTA
+SELECT * from general.CONSULTA
 rollback tran
 
 --Si se prueba es necesario quitar la insercion del indexado
@@ -124,7 +131,7 @@ DBCC CHECKIDENT ('[consulta]', RESEED, 5);
 ---------------------------------------------------------------------------------------------------
 
 --Realice un procedimiento almacenado para el registro y venta de medicamentos
-CREATE or alter PROCEDURE dbo.RegistrarMedicamento
+CREATE or alter PROCEDURE catalogos.RegistrarMedicamento
     @id_medicamento numeric(10, 0),
     @id_consulta numeric(10, 0),
     @nombre_medicamento varchar(10),
@@ -132,11 +139,11 @@ CREATE or alter PROCEDURE dbo.RegistrarMedicamento
     @cantidad numeric(4, 0)
 AS
 BEGIN
-	if exists (Select * from dbo.MEDICAMENTO
+	if exists (Select * from catalogos.MEDICAMENTO
 				where id_medicamento = @id_medicamento and id_consulta = @id_consulta 
 				and nombre_medicamento =@nombre_medicamento and costo = @costo)
 	begin
-		update dbo.MEDICAMENTO set cantidad = @cantidad
+		update catalogos.MEDICAMENTO set cantidad = @cantidad
 		where id_medicamento = @id_medicamento and id_consulta = @id_consulta and
 		nombre_medicamento = @nombre_medicamento and costo = @costo
 
@@ -144,9 +151,9 @@ BEGIN
 	end
 	else
 	begin
-		if exists (select * from dbo.CONSULTA where id_consulta =@id_consulta)
+		if exists (select * from general.CONSULTA where id_consulta =@id_consulta)
 			begin
-				INSERT INTO dbo.MEDICAMENTO(id_consulta,nombre_medicamento,costo,cantidad)
+				INSERT INTO catalogos.MEDICAMENTO(id_consulta,nombre_medicamento,costo,cantidad)
 				VALUES ( @id_consulta, @nombre_medicamento, @costo, @cantidad);
 
 				SELECT 'Consulta registrada correctamente' AS Mensaje;
@@ -163,23 +170,23 @@ END
 
 --cambio de cantidad medicamento
 begin tran
-SELECT * from dbo.MEDICAMENTO
-execute dbo.RegistrarMedicamento 1,1,'Ibuprofeno',700,2
+SELECT * from catalogos.MEDICAMENTO
+execute catalogos.RegistrarMedicamento 1,1,'Ibuprofeno',700,2
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.MEDICAMENTO
+SELECT * from catalogos.MEDICAMENTO
 rollback tran
 --insertar medicamento
 begin tran
-SELECT * from dbo.MEDICAMENTO
-execute dbo.RegistrarMedicamento null,1,'Vendas',150,500
+SELECT * from catalogos.MEDICAMENTO
+execute catalogos.RegistrarMedicamento null,1,'Vendas',150,500
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.MEDICAMENTO
+SELECT * from catalogos.MEDICAMENTO
 rollback tran
 
 --Si se prueba es necesario quitar la insercion del indexado
 DBCC CHECKIDENT ('[MEDICAMENTO]', RESEED, 6);
 
-Select * from dbo.MEDICAMENTO
+Select * from catalogos.MEDICAMENTO
 
 ----------------------------------------------------------------------------------------------
 
@@ -187,7 +194,7 @@ Select * from dbo.MEDICAMENTO
 --, y otro para cancelar una venta en línea
 --así como cancelar una venta física.
 
-CREATE or alter PROCEDURE dbo.AltaProducto -- 
+CREATE or alter PROCEDURE catalogos.AltaProducto -- 
   @id_categoria numeric(2, 0),
 	@descripcion varchar(40),
 	@id_producto numeric(10, 0),
@@ -196,53 +203,53 @@ CREATE or alter PROCEDURE dbo.AltaProducto --
 	@precio money
 AS
 BEGIN
-	if exists (select id_categoria from dbo.CATEGORIA_PRODUCTO where id_categoria = @id_categoria)
+	if exists (select id_categoria from catalogos.CATEGORIA_PRODUCTO where id_categoria = @id_categoria)
 	begin
-		INSERT INTO dbo.PRODUCTO_CENTRAL(id_producto,id_categoria,id_oferta,detalles,precio)
+		INSERT INTO catalogos.PRODUCTO_CENTRAL(id_producto,id_categoria,id_oferta,detalles,precio)
 		VALUES (@id_producto,@id_categoria,@id_oferta,@detalles,@precio);
-		INSERT INTO dbo.PRODUCTO_TIENDA(id_producto,id_categoria,id_oferta,detalles,precio)
+		INSERT INTO catalogos.PRODUCTO_TIENDA(id_producto,id_categoria,id_oferta,detalles,precio)
 		VALUES (@id_producto,@id_categoria,@id_oferta,@detalles,@precio);
 		SELECT 'Se inseto la venta en centra y tienda' AS Mensaje;
 	end
 	else
 	begin
-			INSERT INTO dbo.CATEGORIA_PRODUCTO(descripcion)
+			INSERT INTO catalogos.CATEGORIA_PRODUCTO(descripcion)
 			VALUES (@descripcion);
-			INSERT INTO dbo.PRODUCTO_CENTRAL(id_producto,id_categoria,id_oferta,detalles,precio)
-			VALUES (@id_producto,(select max(id_categoria) from dbo.CATEGORIA_PRODUCTO),@id_oferta,@detalles,@precio);
-			INSERT INTO dbo.PRODUCTO_TIENDA(id_producto,id_categoria,id_oferta,detalles,precio)
-			VALUES (@id_producto,(select max(id_categoria) from dbo.CATEGORIA_PRODUCTO),@id_oferta,@detalles,@precio);
+			INSERT INTO catalogos.PRODUCTO_CENTRAL(id_producto,id_categoria,id_oferta,detalles,precio)
+			VALUES (@id_producto,(select max(id_categoria) from catalogos.CATEGORIA_PRODUCTO),@id_oferta,@detalles,@precio);
+			INSERT INTO catalogos.PRODUCTO_TIENDA(id_producto,id_categoria,id_oferta,detalles,precio)
+			VALUES (@id_producto,(select max(id_categoria) from catalogos.CATEGORIA_PRODUCTO),@id_oferta,@detalles,@precio);
 			SELECT 'Se creo una nueva categoria y se inseto la venta en centra y tienda' AS Mensaje;
 	end
 END
 
 ----Producto con categoria existente
 begin tran
-SELECT * from dbo.PRODUCTO_TIENDA
-execute dbo.AltaProducto 1,null, 12,1,'chicharrones fritos',15.00 
+SELECT * from catalogos.PRODUCTO_TIENDA
+execute catalogos.AltaProducto 1,null, 12,1,'chicharrones fritos',15.00 
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.PRODUCTO_TIENDA
+SELECT * from catalogos.PRODUCTO_TIENDA
 rollback tran
 ----Producto sin categoria
 begin tran
-SELECT * from dbo.PRODUCTO_TIENDA
-execute dbo.AltaProducto null,'comida', 16,null,'chicharrones fritos',15.00 
+SELECT * from catalogos.PRODUCTO_TIENDA
+execute catalogos.AltaProducto null,'comida', 16,null,'chicharrones fritos',15.00 
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-select * from dbo.CATEGORIA_PRODUCTO
-SELECT * from dbo.PRODUCTO_TIENDA
+select * from catalogos.CATEGORIA_PRODUCTO
+SELECT * from catalogos.PRODUCTO_TIENDA
 rollback tran
 
 --, y otro para cancelar una venta en línea
 
-CREATE or alter PROCEDURE dbo.CancelarVentaLinea
+CREATE or alter PROCEDURE general.CancelarVentaLinea
     @id_carrito decimal(10,0)
 as
 begin
-	if exists(select id_carrito from dbo.CARRITO where id_carrito = @id_carrito)
+	if exists(select id_carrito from general.CARRITO where id_carrito = @id_carrito)
 	begin
-		delete from dbo.COMPRA_CARRITO where id_carrito = @id_carrito
-		delete from dbo.CAR_PROD where id_carrito = @id_carrito
-		delete from dbo.CARRITO where id_carrito = @id_carrito
+		delete from general.COMPRA_CARRITO where id_carrito = @id_carrito
+		delete from general.CAR_PROD where id_carrito = @id_carrito
+		delete from general.CARRITO where id_carrito = @id_carrito
 		SELECT 'Se elimino correctamente el pedido '+cast(@id_carrito as varchar) as mensaje
 	end
 	else
@@ -251,18 +258,18 @@ begin
 	end
 end
 
-select * from dbo.CARRITO
+select * from general.CARRITO
 ---Pedido existente
 begin tran
-select * from dbo.CARRITO
-execute dbo.CancelarVentaLinea 123456
-select * from dbo.CARRITO
+select * from general.CARRITO
+execute general.CancelarVentaLinea 123456
+select * from general.CARRITO
 rollback
 --Pedido inexistente
 begin tran
-select * from dbo.CARRITO
-execute dbo.CancelarVentaLinea 122256
-select * from dbo.CARRITO
+select * from general.CARRITO
+execute general.CancelarVentaLinea 122256
+select * from general.CARRITO
 rollback
 
 --así como cancelar una venta física.
@@ -270,10 +277,10 @@ CREATE or alter PROCEDURE dbo.CancelarVentaFisica
     @id_ventaF decimal(10,0)
 as
 begin
-	if exists(select id_ventaF from dbo.VENTA_FISICA where id_ventaF = @id_ventaF)
+	if exists(select id_ventaF from general.VENTA_FISICA where id_ventaF = @id_ventaF)
 	begin
-		delete from dbo.DETALLE_CUENTA where id_ventaF = @id_ventaF
-		delete from dbo.VENTA_FISICA where id_ventaF = @id_ventaF
+		delete from general.DETALLE_CUENTA where id_ventaF = @id_ventaF
+		delete from general.VENTA_FISICA where id_ventaF = @id_ventaF
 		SELECT 'Se elimino correctamente el pedido '+cast(@id_ventaF as varchar) as mensaje
 	end
 	else
@@ -282,18 +289,18 @@ begin
 	end
 end
 
-select * from dbo.VENTA_FISICA
+select * from general.VENTA_FISICA
 ---Pedido existente
 begin tran
-select * from dbo.VENTA_FISICA
+select * from general.VENTA_FISICA
 execute dbo.CancelarVentaFisica 10
-select * from dbo.VENTA_FISICA
+select * from general.VENTA_FISICA
 rollback
 ---Pedido inexistente
 begin tran
-select * from dbo.VENTA_FISICA
+select * from general.VENTA_FISICA
 execute dbo.CancelarVentaFisica 15
-select * from dbo.VENTA_FISICA
+select * from general.VENTA_FISICA
 rollback
 ----------------------------------------------------------------------------------------------
 
@@ -303,17 +310,17 @@ CREATE or alter PROCEDURE dbo.EliminaUsuario
     @nombre_usu varchar(20)
 AS
 BEGIN
-	if exists (select um.id_usuario from dbo.USUARIO_COMUN um 
-		left join dbo.COMPRA_CARRITO cc on cc.id_usuario = um.id_usuario
-		left join dbo.MASCOTA m on m.id_usuario = um.id_usuario
-		left join dbo.REGISTRO_BRAZALETE rb on rb.id_mascota = m.id_mascota
-		left join dbo.CONSULTA c on c.id_mascota = m.id_mascota
-		left join dbo.MEDICAMENTO med on med.id_consulta = c.id_consulta
+	if exists (select um.id_usuario from general.USUARIO_COMUN um 
+		left join general.COMPRA_CARRITO cc on cc.id_usuario = um.id_usuario
+		left join general.MASCOTA m on m.id_usuario = um.id_usuario
+		left join general.REGISTRO_BRAZALETE rb on rb.id_mascota = m.id_mascota
+		left join general.CONSULTA c on c.id_mascota = m.id_mascota
+		left join catalogos.MEDICAMENTO med on med.id_consulta = c.id_consulta
 		where  um.nom = @nombre_usu  and cc.id_ventaC  is null and id_carrito is null and
 		m.id_mascota is null and rb.id_registro is null and c.id_consulta is null and 
 		med.id_medicamento is null)
 	begin
-		delete from dbo.USUARIO_COMUN where nom = @nombre_usu
+		delete from general.USUARIO_COMUN where nom = @nombre_usu
 		SELECT 'usuario eliminado' AS Mensaje;
 	end
 	else
@@ -324,10 +331,10 @@ BEGIN
 END
 --------Elimina usuario comun
 begin tran
-SELECT * from dbo.USUARIO_COMUN
+SELECT * from general.USUARIO_COMUN
 execute dbo.EliminaUsuario 'hugo'
 SELECT 'DESPUES DEL PROCEDIMIENTO'
-SELECT * from dbo.USUARIO_COMUN
+SELECT * from general.USUARIO_COMUN
 rollback tran
 
 ---------------------------------------------------------------------------------

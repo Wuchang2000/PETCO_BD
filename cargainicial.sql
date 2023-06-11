@@ -1,3 +1,10 @@
+/*
+ * EQUIPO 7 GUARDERIA DE MASCOTAS
+ * CORIA MARTINEZ GUSTAVO
+ * ORONZOR MONTES MANASES LEONEL
+ * PANG ARAIZAGA IAN
+*/
+
 -----------------------------------------------------------------------------------------
 --Elaborar el script para la carga de información, el cual debe
 --llamarse cargaInicial.sql. este contendrá los inserts necesarios
@@ -10,7 +17,7 @@
 
 use Equipo7_PETCO
 
-INSERT INTO dbo.ESTADO (nombre)
+INSERT INTO catalogos.ESTADO (nombre)
 values ('Aguascalientes'),
         ('Baja California'),
         ('Baja California Sur'),
@@ -44,11 +51,9 @@ values ('Aguascalientes'),
         ('Yucatan'),
         ('Zacatecas');
 
---select * from dbo.ESTADO
-
 --Usuarios comun---2
 
-INSERT INTO dbo.USUARIO_COMUN(nom, pat, mat, domicilio, curp, genero, telefono, numTargeta, vigencia , correo, contraseña)
+INSERT INTO general.USUARIO_COMUN(nom, pat, mat, domicilio, curp, genero, telefono, numTargeta, vigencia , correo, contraseña)
 VALUES
    ('SONIA', 'ESTRELLA', 'RICOS', 'Yobain 09', 'SOER920113MDFSTR01', 'M', 5562719823, '223516283947362739', '2023-08-27', 'soñaer@yahoo.com', 'agts1763dh26'),
    ('JUAN', 'PÉREZ', 'GARCÍA', 'Calle del Sol 123', 'PERJ900625HDFPNC02', 'H', 5551234567, '987654321098765432', '2023-09-10', 'juan.perez@gmail.com', 'abc123xyz'),
@@ -73,11 +78,10 @@ VALUES
    ('DANIELA', 'MARTÍNEZ', 'HERNÁNDEZ', 'Av. Hidalgo 567', 'MAHD890315HDFNLR09', 'M', 5547892636, '203947562784485629', '2023-07-10', 'daniela.martinez@gmail.com', '24680lkj'),
    ('HUGO', 'GÓMEZ', 'RODRÍGUEZ', 'Calle del Roble 12', 'GORH930505HDFRCD07', 'H', 5572983648, '384756092936475829', '2023-11-01', 'hugo.gomez@gmail.com', '13579zxc');
 
---select * from dbo.USUARIO_COMUN
 
 --centros--3
 
-INSERT INTO dbo.centro (id_estado, oficina_regional)
+INSERT INTO catalogos.centro (id_estado, oficina_regional)
 VALUES
   (1, 1),
   (2, 0),
@@ -112,11 +116,10 @@ VALUES
   (31, 0),
   (32, 0);
 
---select * from dbo.CENTRO
 
 --Empleados--4
 
-INSERT INTO dbo.Empleado (id_centro, nombre, paterno, materno, curp, domicilio) VALUES
+INSERT INTO empleados.Empleado (id_centro, nombre, paterno, materno, curp, domicilio) VALUES
 (1, 'Juan', 'Pérez', 'López', 'PELJ900101HDFXNN02', 'Calle 123, Ciudad de México'),
 (1, 'María', 'Rodríguez', 'García', 'ROGM980202MTZXXX03', 'Avenida Principal 456, Monterrey'),
 (1, 'Alejandro', 'Gómez', 'Hernández', 'GOHA880520GTOXXX04', 'Calle Central 789, Guanajuato'),
@@ -138,11 +141,9 @@ INSERT INTO dbo.Empleado (id_centro, nombre, paterno, materno, curp, domicilio) 
 (24, 'Daniela', 'Navarro', 'Ortega', 'NADO910404HDFXYZ20', 'Avenida 456, Mérida'),
 (24, 'Héctor', 'Jiménez', 'Silva', 'JISH890505HDFXYZ21', 'Calle 789, Monterrey');
 
---select * from dbo.EMPLEADO
-
 --Gestores--5
 
-INSERT INTO dbo.administrativo (id_empleado, id_estado)
+INSERT INTO empleados.administrativo (id_empleado, id_estado)
 VALUES
     (1, 1),
     (5, 7),
@@ -150,11 +151,9 @@ VALUES
     (13,10),
     (17, 24);
 
---select * from dbo.ADMINISTRATIVO
-
 -- Ofertas-- 6
 
-INSERT INTO dbo.oferta (tipo, porcentaje, fecha_ini, fecha_fin)
+INSERT INTO catalogos.oferta (tipo, porcentaje, fecha_ini, fecha_fin)
 VALUES
   ('N', 0.75, '2023-06-07', '2023-06-18'),
   ('L', 0.85, '2023-07-05', '2023-07-12'),
@@ -162,22 +161,20 @@ VALUES
   ('L', 0.95, '2023-07-01', '2023-07-07'),
   ('N', 0.50, '2023-06-10', '2023-06-15');
 
---select * from dbo.oferta
 
 --categoria_producto--7
 
-INSERT INTO CATEGORIA_PRODUCTO (descripcion)
+INSERT INTO catalogos.CATEGORIA_PRODUCTO (descripcion)
 VALUES 
 ('Juguetes'),
 ('Premios'),
 ('Alimentos'),
 ('Utensilios varios');
 
---select * from dbo.CATEGORIA_PRODUCTO
 
 -- producto_central y producto_tienda --8
 
-INSERT INTO dbo.producto_central  (id_producto, id_categoria, id_oferta, detalles, precio)
+INSERT INTO catalogos.producto_central  (id_producto, id_categoria, id_oferta, detalles, precio)
 VALUES
   -- Juguetes
   (1234567890, 1, 3, 'Peluche chirriante "SqueakyBuddy"', 25.99),
@@ -208,9 +205,7 @@ VALUES
 	(3345678901, 4, 2, 'Transportador "EasyTravel"', 69.99);
 
 
---select * from dbo.producto_central
-
-INSERT INTO dbo.producto_tienda  (id_producto, id_categoria, id_oferta, detalles, precio)
+INSERT INTO catalogos.producto_tienda  (id_producto, id_categoria, id_oferta, detalles, precio)
 VALUES
   -- Juguetes
     (1234567890, 1, 3, 'Peluche chirriante "SqueakyBuddy"', 25.99),
@@ -240,11 +235,9 @@ VALUES
 	(1234567880, 4, 1, 'Correa extensible "FlexiLeash"', 29.99),
 	(3345678901, 4, 2, 'Transportador "EasyTravel"', 69.99);
 
---select * from dbo.producto_tienda
-
 -- Vendedor --9
 
-INSERT INTO dbo.vendedor (id_empleado, sueldo, sueldo_total, comision)
+INSERT INTO empleados.vendedor (id_empleado, sueldo, sueldo_total, comision)
 VALUES
    (2, 5000, 5000, 0),
    (6, 5000, 5000, 0),
@@ -252,45 +245,40 @@ VALUES
    (13, 5000, 5000, 0),
    (18, 5000, 5000, 0);
 
---select * from dbo.vendedor
 
 --Personal Ayuda--10
 
-INSERT INTO dbo.PERSONAL_AYUDA(id_empleado,usuario,contraseña,edad,mascota)
+INSERT INTO empleados.PERSONAL_AYUDA(id_empleado,usuario,contraseña,edad,mascota)
 values (3,'blue','gastde1234',20,'P'),
       (7,'red','xdcdece68',25,'G'),
       (11,'black','hbcedh5',24,'P'),
       (14,'lock','jxsbt4',27,'G'),
       (19,'rino','kcxseb2',30,'P');
 
---select * from dbo.PERSONAL_AYUDA
 
 --Telefonos personal ayuda-- 11
 
-insert into dbo.Telefono_Personal(id_telefono,id_empleado,telefono)
+insert into catalogos.Telefono_Personal(id_telefono,id_empleado,telefono)
 values (1, 3, 5561889234),
       (2, 7, 6789054321),
       (3, 11, 1234567890),
       (4, 14, 9876543210),
       (5, 19, 5432167890);
 
---select * from dbo.Telefono_Personal
 
 -- Veterinario-- 12
 
-INSERT INTO dbo.VETERINARIO(id_empleado,CEDULA,especialidad)
+INSERT INTO empleados.VETERINARIO(id_empleado,CEDULA,especialidad)
 values	(4,6534782349,'Cardiologia'),
 		(8,8126453789,'Neurologia'),
 		(12,1083645382,'Radiologia'),
 		(16,5271865235,'Dermatologia'),
 		(20,1452783940,'Traumatologia');
 
---select * from dbo.VETERINARIO
-
 
 --Guarderia--13
 
-INSERT INTO dbo.GUARDERIA (id_centro,fecha_ini,fecha_fin)
+INSERT INTO general.GUARDERIA (id_centro,fecha_ini,fecha_fin)
 values
 (1,'2023-06-10', '2023-06-15'),
 (1,'2023-06-11', '2023-06-16'),
@@ -313,44 +301,37 @@ values
 (24,'2023-06-28', '2023-07-03'),
 (24,'2023-06-29', '2023-07-04');
 
---select * from dbo.GUARDERIA
-
 -- Mascota-- 14
 
-INSERT INTO dbo.MASCOTA(id_empleado,id_guarderia,id_usuario,nombre,especie,sexo,raza,razgos,edad) values
+INSERT INTO general.MASCOTA(id_empleado,id_guarderia,id_usuario,nombre,especie,sexo,raza,razgos,edad) values
 (3,1,3,'LUKE', 'perro', 'macho', 'pastor', 'negro con café', 1),
 (11,2,8,'MAX', 'perro', 'macho', 'labrador', 'dorado', 2),
 (19,3,14,'BELLA', 'perro', 'hembra', 'bulldog ', 'blanco y negro', 3),
 (7,4,9,'MININA', 'gato', 'hembra', 'siamés', 'negro', 2),
 (14,5,16,'LUCY', 'gato', 'hembra', 'atigrado', 'doméstico', 2);
 
---select * from MASCOTA
-
 --CONSULTA --15
 
-INSERT INTO dbo.CONSULTA(id_empleado,id_mascota,fecha, hora,diagnostico,detalles,costo_total) values
+INSERT INTO general.CONSULTA(id_empleado,id_mascota,fecha, hora,diagnostico,detalles,costo_total) values
 (4,1,'2023-06-09','18:10:00','fractura','reposo',0),
 (12,2,'2023-06-16','14:30:00','muy bien','revision',0),
 (20,3,'2023-06-20','15:36:00','vacuna','reposo',0),
 (8,4,'2023-06-24','16:30:00','desparasitacion','asilado',0),
 (16,5,'2023-06-28','17:39:00','mordedura','reposo',0);
 
---select * from CONSULTA
-
 -- REGISTRO_BRAZALETE -- 16
 
-INSERT INTO dbo.REGISTRO_BRAZALETE(id_mascota,ritmoC,[fecha/hora],temp,nivelOx,tipo_Comida,comida_Comio) values
+INSERT INTO general.REGISTRO_BRAZALETE(id_mascota,ritmoC,[fecha/hora],temp,nivelOx,tipo_Comida,comida_Comio) values
 (1,'60-100','2023-06-28 17:39:00','37', '80','croquetas', 'No'),
 (2,'60-100','2023-06-29 12:39:00','37', '70','croquetas', 'No'),
 (3,'60-100','2023-06-27 13:39:00','36', '80','croquetas', 'No'),
 (4,'60-100','2023-06-26 12:39:00','37', '90','croquetas', 'No'),
 (5,'60-100','2023-06-25 13:39:00','36', '80','croquetas', 'No');
 
---select * from REGISTRO_BRAZALETE
 
 -- MEDICAMENTO -- 17
 
-INSERT INTO dbo.MEDICAMENTO(id_consulta,nombre_medicamento,costo, cantidad) values
+INSERT INTO catalogos.MEDICAMENTO(id_consulta,nombre_medicamento,costo, cantidad) values
 (1,'Ibuprofeno',700, 500),
 (1,'Aspirina',100, 500),
 (3,'Atrabica', 150, 500),
@@ -358,12 +339,10 @@ INSERT INTO dbo.MEDICAMENTO(id_consulta,nombre_medicamento,costo, cantidad) valu
 (5,'Ibuprofeno',700, 500),
 (5,'Anestesia',500, 500);
 
---select * from MEDICAMENTO
-
 
 --Venta fisica--
 
-INSERT INTO dbo.venta_fisica (id_empleado, total)
+INSERT INTO general.venta_fisica (id_empleado, total)
 VALUES
 (2, 25.99),
 (6, 12.99),
@@ -376,12 +355,10 @@ VALUES
 (13, 22.99),
 (18, 49.99);
 
---SELECT * from dbo.venta_fisica
- 
 
 -- Detalle cuenta -- 
 
-INSERT INTO dbo.detalle_cuenta (id_ventaF, id_producto, montoparcial, cantidad)
+INSERT INTO general.detalle_cuenta (id_ventaF, id_producto, montoparcial, cantidad)
 VALUES
   (1, 1234567890, 25.99, 3),
   (2, 2345678901, 12.99, 2),
@@ -394,11 +371,10 @@ VALUES
   (9, 9412345678, 22.99, 5),
   (10, 1234765890, 49.99, 3);
 
---SELECT * from dbo.detalle_cuenta
 
 --Carrito--
 
-INSERT INTO dbo.Carrito (id_carrito, id_usuario, cantidad)
+INSERT INTO general.Carrito (id_carrito, id_usuario, cantidad)
 VALUES
   (123456, 1, 3),
   (234567, 10, 2),
@@ -427,12 +403,10 @@ VALUES
   (267890, 10, 5),
   (278901, 9, 1);
 
---SELECT * from dbo.carrito
-
 
 --Car-prod--
 
-INSERT INTO dbo.car_prod (id_carrito, id_producto, montoparcial, cantidad)
+INSERT INTO general.car_prod (id_carrito, id_producto, montoparcial, cantidad)
 VALUES
 (123456, 1234567890, 25.99, 3),
 (234567, 2345678901, 12.99, 2),
@@ -455,11 +429,9 @@ VALUES
 (245678, 1234567880, 22.99, 2),
 (256789, 3345678901, 49.99, 3);
 
---select * from dbo.car_prod
-
 
 ---compra_carrito
-INSERT INTO dbo.compra_carrito (id_carrito, id_usuario, id_producto, detalles, montoparcial)
+INSERT INTO general.compra_carrito (id_carrito, id_usuario, id_producto, detalles, montoparcial)
 VALUES
 (123456, 1, 1234567890, 'Compra del producto', 25.99),
 (234567, 10, 2345678901, 'Compra del producto', 12.99),
@@ -482,32 +454,29 @@ VALUES
 (245678, 5, 1234567880, 'Compra del producto', 22.99),
 (256789, 1, 3345678901, 'Compra del producto', 49.99);
 
---select * from dbo.compra_carrito
-
-
 
 --Select de todas las tablas
 
-select * from dbo.ESTADO--1
-select * from dbo.USUARIO_COMUN--2
-select * from dbo.CENTRO--3
-select * from dbo.EMPLEADO--4
-select * from dbo.ADMINISTRATIVO--5
-select * from dbo.oferta--6
-select * from dbo.CATEGORIA_PRODUCTO--7
-select * from dbo.producto_central--8
-select * from dbo.producto_tienda--9
-select * from dbo.vendedor--10
-select * from dbo.PERSONAL_AYUDA--11
-select * from dbo.Telefono_Personal--12
-select * from dbo.VETERINARIO--13
-select * from dbo.GUARDERIA--14
-select * from MASCOTA--15
-select * from CONSULTA--16
-select * from REGISTRO_BRAZALETE--17
-select * from MEDICAMENTO--18
-select * from dbo.venta_fisica--19
-SELECT * from dbo.detalle_cuenta--20
-SELECT * from dbo.carrito--21
-select * from dbo.car_prod--22
-select * from dbo.compra_carrito--23
+select * from catalogos.ESTADO--1
+select * from general.USUARIO_COMUN--2
+select * from catalogos.CENTRO--3
+select * from empleados.EMPLEADO--4
+select * from empleados.ADMINISTRATIVO--5
+select * from catalogos.oferta--6
+select * from catalogos.CATEGORIA_PRODUCTO--7
+select * from catalogos.producto_central--8
+select * from catalogos.producto_tienda--9
+select * from empleados.vendedor--10
+select * from empleados.PERSONAL_AYUDA--11
+select * from catalogos.Telefono_Personal--12
+select * from empleados.VETERINARIO--13
+select * from general.GUARDERIA--14
+select * from general.MASCOTA--15
+select * from general.CONSULTA--16
+select * from general.REGISTRO_BRAZALETE--17
+select * from catalogos.MEDICAMENTO--18
+select * from general.venta_fisica--19
+SELECT * from general.detalle_cuenta--20
+SELECT * from general.carrito--21
+select * from general.car_prod--22
+select * from general.compra_carrito--23
