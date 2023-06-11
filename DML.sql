@@ -1,3 +1,5 @@
+-------------------------------------PROCEDIMIENTOS ALMACENADOS-------------------------------------------
+
 --Realice un procedimiento almacenado para registrar una mascota y su brazalete
 Create or alter procedure dbo.registro_mascota_brazalete
 @p_id_empleado numeric(10, 0),
@@ -389,3 +391,6 @@ BEGIN
     -- Eliminar el usuario
     EXEC sp_dropuser @NombreUsuario;
 END;
+
+------------------------------------------TRIGGER-------------------------------------
+
