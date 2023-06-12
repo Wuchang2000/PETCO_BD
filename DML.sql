@@ -140,28 +140,19 @@ CREATE or alter PROCEDURE catalogos.RegistrarMedicamento
 AS
 BEGIN
 	if exists (Select * from catalogos.MEDICAMENTO
-				where id_medicamento = @id_medicamento and id_consulta = @id_consulta 
+				where id_medicamento = @id_medicamento
 				and nombre_medicamento =@nombre_medicamento and costo = @costo)
 	begin
 		update catalogos.MEDICAMENTO set cantidad = @cantidad
-		where id_medicamento = @id_medicamento and id_consulta = @id_consulta and
+		where id_medicamento = @id_medicamento and
 		nombre_medicamento = @nombre_medicamento and costo = @costo
 
 		SELECT 'Se cambio correctamente la cantidad de medicamento' AS Mensaje;
 	end
 	else
 	begin
-		if exists (select * from general.CONSULTA where id_consulta =@id_consulta)
-			begin
-				INSERT INTO catalogos.MEDICAMENTO(id_consulta,nombre_medicamento,costo,cantidad)
-				VALUES ( @id_consulta, @nombre_medicamento, @costo, @cantidad);
-
-				SELECT 'Consulta registrada correctamente' AS Mensaje;
-			end
-		else 
-		begin
-			SELECT 'La consulta a la que quiere agregar el medicamento no existe ' AS Mensaje;
-		end
+		INSERT INTO catalogos.MEDICAMENTO(nombre_medicamento, costo,cantidad)
+				VALUES (@nombre_medicamento, @costo, @cantidad);
 	end
     
 END
@@ -315,10 +306,10 @@ BEGIN
 		left join general.MASCOTA m on m.id_usuario = um.id_usuario
 		left join general.REGISTRO_BRAZALETE rb on rb.id_mascota = m.id_mascota
 		left join general.CONSULTA c on c.id_mascota = m.id_mascota
-		left join catalogos.MEDICAMENTO med on med.id_consulta = c.id_consulta
+		left join general.receta rec on rec.id_consulta = c.id_consulta
 		where  um.nom = @nombre_usu  and cc.id_ventaC  is null and id_carrito is null and
 		m.id_mascota is null and rb.id_registro is null and c.id_consulta is null and 
-		med.id_medicamento is null)
+		rec.id_medicamento is null)
 	begin
 		delete from general.USUARIO_COMUN where nom = @nombre_usu
 		SELECT 'usuario eliminado' AS Mensaje;
