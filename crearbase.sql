@@ -170,6 +170,26 @@ ELSE
 go
 
 /* 
+ * TABLE: RECETA 
+ */
+
+CREATE TABLE general.RECETA(
+    id_receta    numeric(10, 0)    IDENTITY(1,1) NOT NULL,
+    id_consulta numeric(10, 0)     NOT NULL,
+	id_medicamento numeric(10, 0)  NOT NULL,
+	cantidad	numeric(2, 0)	   NOT NULL
+    CONSTRAINT PK_RECETA PRIMARY KEY NONCLUSTERED (id_receta)
+)
+go
+
+
+IF OBJECT_ID('general.RECETA') IS NOT NULL
+    PRINT '<<< CREATED TABLE RECETA >>>'
+ELSE
+    PRINT '<<< FAILED CREATING TABLE RECETA >>>'
+go
+
+/* 
  * TABLE: DETALLE_CUENTA 
  */
 
@@ -287,7 +307,6 @@ go
 
 CREATE TABLE catalogos.MEDICAMENTO(
     id_medicamento        numeric(10, 0)    IDENTITY(1,1),
-    id_consulta           numeric(10, 0)    NOT NULL,
     nombre_medicamento    varchar(10)       NOT NULL,
     costo                 money             NOT NULL,
 	cantidad			  numeric(4, 0)		NOT NULL
@@ -614,6 +633,20 @@ ALTER TABLE general.CONSULTA ADD CONSTRAINT FK_MASCOTA_CONSULTA
     REFERENCES general.MASCOTA(id_mascota)
 go
 
+/* 
+ * TABLE: RECETA
+ */
+
+ALTER TABLE general.RECETA ADD CONSTRAINT FK_RECETA_MEDICAMENTO
+    FOREIGN KEY (id_medicamento)
+    REFERENCES catalogos.Medicamento(id_medicamento)
+go
+
+ALTER TABLE general.RECETA ADD CONSTRAINT FK_RECETA_CONSULTA
+    FOREIGN KEY (id_consulta)
+    REFERENCES general.consulta(id_consulta)
+go
+
 
 /* 
  * TABLE: DETALLE_CUENTA 
@@ -667,16 +700,6 @@ go
 ALTER TABLE general.MASCOTA ADD CONSTRAINT FK_USUARIO_COMUN_MASCOTA
     FOREIGN KEY (id_usuario)
     REFERENCES general.USUARIO_COMUN(id_usuario)
-go
-
-
-/* 
- * TABLE: MEDICAMENTO 
- */
-
-ALTER TABLE catalogos.MEDICAMENTO ADD CONSTRAINT FK_CONSULTA_MEDICAMENTO
-    FOREIGN KEY (id_consulta)
-    REFERENCES general.CONSULTA(id_consulta)
 go
 
 

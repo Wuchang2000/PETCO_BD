@@ -312,12 +312,24 @@ INSERT INTO general.MASCOTA(id_empleado,id_guarderia,id_usuario,nombre,especie,s
 
 --CONSULTA --15
 
-INSERT INTO general.CONSULTA(id_empleado,id_mascota,fecha, hora,diagnostico,detalles,costo_total) values
-(4,1,'2023-06-09','18:10:00','fractura','reposo',0),
-(12,2,'2023-06-16','14:30:00','muy bien','revision',0),
-(20,3,'2023-06-20','15:36:00','vacuna','reposo',0),
-(8,4,'2023-06-24','16:30:00','desparasitacion','asilado',0),
-(16,5,'2023-06-28','17:39:00','mordedura','reposo',0);
+INSERT INTO general.CONSULTA (id_empleado, id_mascota, fecha, hora, diagnostico, detalles, costo_total)
+VALUES
+  (4, 1, '2023-06-09', '18:10:00', 'Conjuntivitis', 'reposo', 190),
+  (8, 2, '2023-06-16', '14:30:00', 'Dermatitis alérgica', 'revision', 245),
+  (12, 3, '2023-06-20', '15:36:00', 'Otitis externa', 'reposo', 270),
+  (16, 4, '2023-06-24', '16:30:00', 'Gastroenteritis', 'asilado', 200),
+  (20, 5, '2023-06-28', '17:39:00', 'Alergias cutáneas', 'reposo', 280),
+  (4, 1, '2023-07-02', '09:15:00', 'Conjuntivitis', 'reposo', 180),
+  (8, 2, '2023-07-05', '11:45:00', 'Dermatitis alérgica', 'revision', 210),
+  (12, 3, '2023-07-08', '13:20:00', 'Otitis externa', 'reposo', 290),
+  (16, 4, '2023-07-11', '15:50:00', 'Gastroenteritis', 'asilado', 250),
+  (20, 5, '2023-07-14', '18:30:00', 'Alergias cutáneas', 'reposo', 170),
+  (4, 1, '2023-07-17', '10:00:00', 'Conjuntivitis', 'reposo', 220),
+  (8, 2, '2023-07-20', '12:30:00', 'Dermatitis alérgica', 'revision', 260),
+  (12, 3, '2023-07-23', '15:00:00', 'Otitis externa', 'reposo', 180),
+  (16, 4, '2023-07-26', '17:45:00', 'Gastroenteritis', 'asilado', 290),
+  (20, 5, '2023-07-29', '19:20:00', 'Alergias cutáneas', 'reposo', 200);
+
 
 -- REGISTRO_BRAZALETE -- 16
 
@@ -331,13 +343,13 @@ INSERT INTO general.REGISTRO_BRAZALETE(id_mascota,ritmoC,[fecha/hora],temp,nivel
 
 -- MEDICAMENTO -- 17
 
-INSERT INTO catalogos.MEDICAMENTO(id_consulta,nombre_medicamento,costo, cantidad) values
-(1,'Ibuprofeno',700, 500),
-(1,'Aspirina',100, 500),
-(3,'Atrabica', 150, 500),
-(4,'Loxcell', 180, 500),
-(5,'Ibuprofeno',700, 500),
-(5,'Anestesia',500, 500);
+INSERT INTO catalogos.MEDICAMENTO(nombre_medicamento,costo, cantidad) values
+('Ibuprofeno',700, 500),
+('Aspirina',100, 500),
+('Atrabica', 150, 500),
+('Loxcell', 180, 500),
+('Ibuprofeno',700, 500),
+('Anestesia',500, 500);
 
 
 --Venta fisica--
@@ -455,6 +467,24 @@ VALUES
 (256789, 1, 3345678901, 'Compra del producto', 49.99);
 
 
+--RECETA
+INSERT INTO general.RECETA (id_consulta, id_medicamento, cantidad) VALUES
+(1, 1, 2),
+(2, 3, 1),
+(3, 2, 3),
+(4, 4, 1),
+(5, 5, 2),
+(6, 1, 3),
+(7, 2, 2),
+(8, 5, 1),
+(9, 3, 3),
+(10, 1, 1),
+(11, 4, 2),
+(12, 5, 3),
+(13, 2, 1),
+(14, 1, 2),
+(15, 3, 3);
+
 --Select de todas las tablas
 
 select * from catalogos.ESTADO--1
@@ -480,3 +510,4 @@ SELECT * from general.detalle_cuenta--20
 SELECT * from general.carrito--21
 select * from general.car_prod--22
 select * from general.compra_carrito--23
+select * from general.receta --24
