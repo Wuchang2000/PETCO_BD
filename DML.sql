@@ -47,10 +47,10 @@ SELECT * from general.REGISTRO_BRAZALETE
 rollback tran
 
 --Si se prueba es necesario quitar la insercion del indexado
-DBCC CHECKIDENT ('[mascota]', RESEED, 5);
-DBCC CHECKIDENT ('[registro_brazalete]', RESEED, 5);
-DBCC CHECKIDENT ('[mascota]', NORESEED);
-DBCC CHECKIDENT ('[registro_brazalete]', NORESEED);
+DBCC CHECKIDENT ('general.mascota', RESEED, 5);
+DBCC CHECKIDENT ('general.registro_brazalete', RESEED, 5);
+DBCC CHECKIDENT ('general.mascota', NORESEED);
+DBCC CHECKIDENT ('general.registro_brazalete', NORESEED);
 
 ------------------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ SELECT * from general.CONSULTA
 rollback tran
 
 --Si se prueba es necesario quitar la insercion del indexado
-DBCC CHECKIDENT ('[consulta]', RESEED, 5);
+DBCC CHECKIDENT ('general.consulta', RESEED, 15);
 
 ---------------------------------------------------------------------------------------------------
 
@@ -175,7 +175,7 @@ SELECT * from catalogos.MEDICAMENTO
 rollback tran
 
 --Si se prueba es necesario quitar la insercion del indexado
-DBCC CHECKIDENT ('[MEDICAMENTO]', RESEED, 6);
+DBCC CHECKIDENT ('catalogos.MEDICAMENTO', RESEED, 6);
 
 Select * from catalogos.MEDICAMENTO
 
@@ -238,10 +238,10 @@ as
 begin
 	if exists(select id_carrito from general.CARRITO where id_carrito = @id_carrito)
 	begin
-		delete from general.COMPRA_CARRITO where id_carrito = @id_carrito
-		delete from general.CAR_PROD where id_carrito = @id_carrito
-		delete from general.CARRITO where id_carrito = @id_carrito
-		SELECT 'Se elimino correctamente el pedido '+cast(@id_carrito as varchar) as mensaje
+		update general.COMPRA_CARRITO
+		set montoParcial = montoParcial*0.2
+		where id_carrito = @id_carrito
+		SELECT 'Se cancelo correctamente el pedido '+cast(@id_carrito as varchar) as mensaje
 	end
 	else
 	begin
@@ -252,15 +252,15 @@ end
 select * from general.CARRITO
 ---Pedido existente
 begin tran
-select * from general.CARRITO
+select * from general.COMPRA_CARRITO
 execute general.CancelarVentaLinea 123456
-select * from general.CARRITO
+select * from general.COMPRA_CARRITO
 rollback
 --Pedido inexistente
 begin tran
-select * from general.CARRITO
+select * from general.COMPRA_CARRITO
 execute general.CancelarVentaLinea 122256
-select * from general.CARRITO
+select * from general.COMPRA_CARRITO
 rollback
 
 --así como cancelar una venta física.
@@ -390,5 +390,168 @@ BEGIN
     EXEC sp_dropuser @NombreUsuario;
 END;
 
-------------------------------------------TRIGGER-------------------------------------
+--------------------------------TRIGGER-----------------------------
 
+-- trigger que calcula el costo total de la consulta
+
+CREATE or alter TRIGGER general.CalcularCostoTotal
+ON general.RECETA
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    UPDATE consulta
+    SET costo_total = (
+        SELECT ISNULL(SUM(m.costo * r.cantidad), 0) + 150 
+        FROM general.RECETA r
+        INNER JOIN catalogos.MEDICAMENTO m ON r.id_medicamento = m.id_medicamento
+        WHERE r.id_consulta = consulta.id_consulta
+    )
+    FROM general.CONSULTA consulta
+    WHERE consulta.id_consulta IN (
+        SELECT DISTINCT id_consulta FROM inserted
+        UNION
+        SELECT DISTINCT id_consulta FROM deleted
+    )
+end
+
+--trigger que limita que un cuidador tenga maximo 5 mascotas que atender
+
+CREATE or alter TRIGGER general.LimitarCantidadMascotas
+ON general.mascota
+AFTER INSERT, UPDATE
+AS
+begin
+    DECLARE @TotalMascotas INTeger
+    set @TotalMascotas = (select COUNT(*) FROM general.MASCOTA where id_empleado = (select id_empleado from inserted))
+    IF @TotalMascotas > 5
+    BEGIN
+        print 'No se pueden agregar más de 5 mascotas.'
+        ROLLBACK TRANSACTION
+        RETURN
+    END
+end	
+
+
+-- triger que hace la cantidad maxima de veterinarios por centro es de 3
+
+CREATE or alter TRIGGER empleados.LimitarCantidadVeterinariosPorCentro
+ON empleados.empleado
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    DECLARE @CentroID INTEGER, @TotalVeterinarios INTEGER
+
+    SELECT @CentroID = e.id_centro
+    FROM empleados.EMPLEADO e
+    INNER JOIN inserted i ON e.id_empleado = i.id_empleado
+
+    SELECT @TotalVeterinarios = COUNT(*)
+    FROM empleados.VETERINARIO v
+    INNER JOIN empleados.EMPLEADO e ON v.id_empleado = e.id_empleado
+    WHERE e.id_centro = @CentroID
+
+    IF @TotalVeterinarios > 3
+    BEGIN
+		print 'No se pueden agregar más de 3 veterinarios para el centro '
+        ROLLBACK TRANSACTION
+        RETURN
+		
+    END
+END
+
+---trigger actualiza el costo del monto parcial de car prod
+
+CREATE TRIGGER general.ActualizarMontoParcialCarProd
+ON general.CAR_PROD
+AFTER INSERT
+AS
+BEGIN
+    -- Actualizar el monto parcial en la tabla CAR_PROD
+    UPDATE cp
+    SET montoParcial = p.precio
+    FROM general.CAR_PROD cp
+    INNER JOIN inserted i ON cp.id_producto = i.id_producto
+    INNER JOIN catalogos.PRODUCTO_CENTRAL p ON cp.id_producto = p.id_producto
+    WHERE cp.id_carrito = i.id_carrito
+END
+
+--- trigger que actualiza el monto parcial de compra carrito
+
+CREATE TRIGGER general.ActualizarMontoParcial
+ON general.CAR_PROD
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    -- Actualizar las compras de carrito afectadas
+    UPDATE compra
+    SET montoParcial = ISNULL((SELECT SUM(p.precio * c.cantidad)
+        FROM general.CAR_PROD c
+        INNER JOIN catalogos.PRODUCTO_CENTRAL p ON c.id_producto = p.id_producto
+        WHERE c.id_carrito = compra.id_carrito ), 0)
+    FROM general.COMPRA_CARRITO compra
+    WHERE compra.id_carrito IN (
+        SELECT DISTINCT id_carrito FROM inserted
+        UNION
+        SELECT DISTINCT id_carrito FROM deleted
+    )
+END
+
+--- trigger que aplica descuento y sumatoria de la venta fisica
+
+
+CREATE or alter TRIGGER general.AplicarDescuentoSumarMontoDetalleCuenta
+ON general.DETALLE_CUENTA
+AFTER INSERT
+AS
+BEGIN
+    -- Actualizar montoParcial con descuento por oferta
+    UPDATE dc
+    SET montoParcial = CASE
+                            WHEN o.tipo = 'N' THEN p.precio * (1 - (o.porcentaje / 100))
+                            WHEN o.tipo = 'L' THEN p.precio * (1 - (o.porcentaje / 100))
+                            ELSE p.precio
+                       END 
+    FROM general.DETALLE_CUENTA dc
+    INNER JOIN inserted i ON dc.id_ventaF = i.id_ventaF AND dc.id_producto = i.id_producto
+    INNER JOIN catalogos.PRODUCTO_TIENDA p ON dc.id_producto = p.id_producto
+    INNER JOIN catalogos.OFERTA o ON p.id_oferta = o.id_oferta
+
+    -- Actualizar total en VENTA_FISICA
+    UPDATE vf
+    SET total = ISNULL((
+        SELECT SUM(d.montoParcial * d.cantidad)
+        FROM general.DETALLE_CUENTA d
+        WHERE d.id_ventaF = vf.id_ventaF
+    ), 0)
+    FROM general.VENTA_FISICA vf
+    INNER JOIN inserted i ON vf.id_ventaF = i.id_ventaF
+END
+
+--trigger que pone la comision al vendedor
+
+CREATE TRIGGER general.CalcularComisionSumarSueldoTotal
+ON general.VENTA_FISICA
+AFTER INSERT
+AS
+BEGIN
+    -- Actualizar comision y sumar al sueldo total del vendedor
+    UPDATE v
+    SET comision = (i.total * 0.15),
+        sueldo_total = sueldo_total + (i.total * 0.15)
+    FROM empleados.VENDEDOR v
+    INNER JOIN inserted i ON v.id_empleado = i.id_empleado
+END
+
+
+--trigger que valida la existencia del estado antes de insertarse
+CREATE or alter TRIGGER empleados.tr_verificar_estado_administrativo
+ON empleados.ADMINISTRATIVO
+instead of INSERT, UPDATE
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM inserted WHERE id_estado NOT IN (SELECT id_estado FROM catalogos.ESTADO))
+    BEGIN
+        RAISERROR('El estado especificado no existe en la tabla ESTADO.', 16, 1)
+        ROLLBACK TRANSACTION
+    END
+END

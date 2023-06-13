@@ -1,5 +1,3 @@
-SELECT * from empleados.EMPLEADO
-
 --REPORTE GUARDERIA
 --1. El tipo de mascota que más se deja en la guardería para su cuidado (tipo y
 --cantidad).
@@ -133,3 +131,99 @@ SELECT * from general.reporte_venta_medicamento order by fecha
 
 --1. El centro con mayor número de ventas en un periodo de tiempo. (Separar las
 --ventas en línea de las ventas físicas de cada estado).
+CREATE OR ALTER VIEW general.REPORTE_VENTAS_FISICAS
+as
+SELECT top 1 es.nombre as estado, c.id_centro,
+sum(c.id_centro) as ventas_fisicas
+from general.VENTA_FISICA vf
+inner join empleados.VENDEDOR ve on vf.id_empleado = ve.id_empleado
+inner join empleados.EMPLEADO e on e.id_empleado = vf.id_empleado
+inner join catalogos.CENTRO c on c.id_centro = e.id_centro
+inner join catalogos.ESTADO es on es.id_estado = c.id_estado
+group by es.nombre, c.id_centro
+order by sum(vf.id_empleado) desc
+
+SELECT * from general.REPORTE_VENTAS_FISICAS
+
+--2. Los artículos más vendidos y los menos vendidos por categoría.
+--Ventas fisicas
+CREATE OR ALTER VIEW general.datos_ventasF
+as
+SELECT cp.descripcion as categoria, pt.detalles as producto,
+sum(dc.cantidad) as cantidad_vendida from general.VENTA_FISICA vf
+inner join general.DETALLE_CUENTA dc on dc.id_ventaF = vf.id_ventaF
+inner join catalogos.PRODUCTO_TIENDA pt on pt.id_producto = pt.id_producto
+inner join catalogos.CATEGORIA_PRODUCTO cp on cp.id_categoria = pt.id_categoria
+group by cp.descripcion, pt.detalles, cp.id_categoria
+
+CREATE OR ALTER FUNCTION general.REPORTE_MAS_VENDIDOF()
+returns @result table (categoria varchar(40),
+						producto varchar(40),
+						cantidad numeric(4,0))
+as
+begin
+	declare @max int = (SELECT count(id_categoria) from catalogos.CATEGORIA_PRODUCTO)
+	declare @count int = 1
+	WHILE @count <= @max
+	begin
+		insert into @result
+		SELECT top 1 * from general.datos_ventasF 
+		where categoria = (SELECT descripcion from catalogos.CATEGORIA_PRODUCTO 
+							where id_categoria = @count)
+		order by cantidad_vendida desc
+		insert into @result
+		SELECT top 1 * from general.datos_ventasF 
+		where categoria = (SELECT descripcion from catalogos.CATEGORIA_PRODUCTO 
+							where id_categoria = @count)
+		order by cantidad_vendida asc
+		set @count = @count+1
+	end
+	return
+end
+
+SELECT * from general.REPORTE_MAS_VENDIDOF()
+
+--Ventas virtuales
+CREATE OR ALTER VIEW general.datos_ventasV
+as
+SELECT cap.descripcion as categoria, pc.detalles as producto,
+sum(cp.cantidad) as cantidad_vendida from general.COMPRA_CARRITO cc
+inner join general.CAR_PROD cp on cp.id_carrito = cc.id_carrito
+inner join catalogos.PRODUCTO_CENTRAL pc on pc.id_producto = cp.id_producto
+inner join catalogos.CATEGORIA_PRODUCTO cap on cap.id_categoria = pc.id_categoria
+group by cap.descripcion, pc.detalles, cap.id_categoria
+
+CREATE OR ALTER FUNCTION general.REPORTE_MAS_VENDIDOV()
+returns @result table (categoria varchar(40),
+						producto varchar(40),
+						cantidad numeric(4,0))
+as
+begin
+	declare @max int = (SELECT count(id_categoria) from catalogos.CATEGORIA_PRODUCTO)
+	declare @count int = 1
+	WHILE @count <= @max
+	begin
+		insert into @result
+		SELECT top 1 * from general.datos_ventasV 
+		where categoria = (SELECT descripcion from catalogos.CATEGORIA_PRODUCTO 
+							where id_categoria = @count)
+		order by cantidad_vendida desc
+		insert into @result
+		SELECT top 1 * from general.datos_ventasV
+		where categoria = (SELECT descripcion from catalogos.CATEGORIA_PRODUCTO 
+							where id_categoria = @count)
+		order by cantidad_vendida asc
+		set @count = @count+1
+	end
+	return
+end
+
+SELECT * from general.REPORTE_MAS_VENDIDOV()
+
+--3. Época en la que más se vende. Época del año y monto total
+
+--4. Los 5 empleados con mayor comisión, este reporte se obtiene de manera
+--mensual
+
+--5. Inventario de las tiendas de cada tienda
+
